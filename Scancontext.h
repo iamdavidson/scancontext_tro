@@ -5,7 +5,7 @@
 #include <cmath>
 #include <utility>
 #include <vector>
-#include <algorithm> 
+// #include <algorithm> 
 #include <cstdlib>
 #include <memory>
 #include <iostream>
@@ -22,7 +22,7 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl_conversions/pcl_conversions.h>
 
-#include "nanoflann.hpp"
+// #include "nanoflann.hpp"
 #include "KDTreeVectorOfVectorsAdaptor.h"
 
 #include "tictoc.h"
@@ -59,6 +59,18 @@ class SCManager
 {
 public: 
     SCManager( ) = default; // reserving data space (of std::vector) could be considered. but the descriptor is lightweight so don't care.
+    SCManager(
+        double lidar_heigh,
+        int pc_num_ring,
+        int pc_num_sector,
+        double pc_max_radius,
+        int num_exclude_recent,
+        int num_candidates_from_tree,
+        double search_ratio,
+        double sc_dist_thres,
+        int tree_making_period
+    );
+
 
     Eigen::MatrixXd makeScancontext( pcl::PointCloud<SCPointType> & _scan_down );
     Eigen::MatrixXd makeRingkeyFromScancontext( Eigen::MatrixXd &_desc );

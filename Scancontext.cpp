@@ -66,6 +66,28 @@ std::vector<float> eig2stdvec( MatrixXd _eigmat )
 } // eig2stdvec
 
 
+SCManager::SCManager(
+        double lidar_heigh,
+        int pc_num_ring,
+        int pc_num_sector,
+        double pc_max_radius,
+        int num_exclude_recent,
+        int num_candidates_from_tree,
+        double search_ratio,
+        double sc_dist_thres,
+        int tree_making_period
+    ) : 
+    LIDAR_HEIGHT(lidar_heigh),
+    PC_NUM_RING(pc_num_ring),
+    PC_NUM_SECTOR(pc_num_sector),
+    PC_MAX_RADIUS(pc_max_radius),
+    NUM_EXCLUDE_RECENT(num_exclude_recent),
+    NUM_CANDIDATES_FROM_TREE(num_candidates_from_tree),
+    SEARCH_RATIO(search_ratio),
+    SC_DIST_THRES(sc_dist_thres),
+    TREE_MAKING_PERIOD_(tree_making_period) {}
+
+
 double SCManager::distDirectSC ( MatrixXd &_sc1, MatrixXd &_sc2 )
 {
     int num_eff_cols = 0; // i.e., to exclude all-nonzero sector
