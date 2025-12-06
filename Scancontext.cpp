@@ -249,7 +249,7 @@ MatrixXd SCManager::makeSectorkeyFromScancontext( Eigen::MatrixXd &_desc )
 } // SCManager::makeSectorkeyFromScancontext
 
 
-void SCManager::makeAndSaveScancontextAndKeys( pcl::PointCloud<SCPointType> & _scan_down )
+uint64_t SCManager::makeAndSaveScancontextAndKeys( pcl::PointCloud<SCPointType> & _scan_down )
 {
     Eigen::MatrixXd sc = makeScancontext(_scan_down); // v1 
     Eigen::MatrixXd ringkey = makeRingkeyFromScancontext( sc );
@@ -261,8 +261,8 @@ void SCManager::makeAndSaveScancontextAndKeys( pcl::PointCloud<SCPointType> & _s
     polarcontext_vkeys_.push_back( sectorkey );
     polarcontext_invkeys_mat_.push_back( polarcontext_invkey_vec );
 
-    // cout <<polarcontext_vkeys_.size() << endl;
-
+    return polarcontexts_.size()-1;
+    
 } // SCManager::makeAndSaveScancontextAndKeys
 
 
