@@ -43,8 +43,8 @@ using KeyMat = std::vector<std::vector<float> >;
 using InvKeyTree = KDTreeVectorOfVectorsAdaptor< KeyMat, float >;
 
 
-// namespace SC2
-// {
+namespace SC2
+{
 
 void coreImportTest ( void );
 
@@ -68,7 +68,8 @@ public:
         int num_candidates_from_tree,
         double search_ratio,
         double sc_dist_thres,
-        int tree_making_period
+        int tree_making_period,
+        double downsample_res
     );
 
 
@@ -81,8 +82,11 @@ public:
     std::pair<double, int> distanceBtnScanContext ( MatrixXd &_sc1, MatrixXd &_sc2 ); // "D" (eq 6) in the original paper (IROS 18)
 
     // User-side API
-    uint64_t makeAndSaveScancontextAndKeys( pcl::PointCloud<SCPointType> & _scan_down );
+    uint64_t makeAndSaveScancontextAndKeys( pcl::PointCloud<SCPointType>::Ptr & _scan_down, bool preprocessing = false);
     std::pair<int, float> detectLoopClosureID( void ); // int: nearest node index, float: relative yaw  
+    bool descriptorExists(uint64_t id);
+    Eigen::MatrixXd getDescriptor(uint64_t id);
+    void preprocess(pcl::PointCloud<SCPointType>::Ptr &pc);
 
 public:
     // hyper parameters ()
@@ -107,6 +111,8 @@ public:
     const int    TREE_MAKING_PERIOD_ = 50; // i.e., remaking tree frequency, to avoid non-mandatory every remaking, to save time cost / if you want to find a very recent revisits use small value of it (it is enough fast ~ 5-50ms wrt N.).
     int          tree_making_period_conter = 0;
 
+    const double DOWNSAMPLE_RES = 0.2;
+
     // data 
     std::vector<double> polarcontexts_timestamp_; // optional.
     std::vector<Eigen::MatrixXd> polarcontexts_;
@@ -119,4 +125,4 @@ public:
 
 }; // SCManager
 
-// } // namespace SC2
+} // namespace SC2

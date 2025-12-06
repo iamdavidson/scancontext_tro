@@ -1,7 +1,7 @@
 #include "Scancontext.h"
 
-// namespace SC2
-// {
+namespace SC2
+{
 
 void coreImportTest (void)
 {
@@ -75,7 +75,8 @@ SCManager::SCManager(
         int num_candidates_from_tree,
         double search_ratio,
         double sc_dist_thres,
-        int tree_making_period
+        int tree_making_period,
+        double downsample_res
     ) : 
     LIDAR_HEIGHT(lidar_heigh),
     PC_NUM_RING(pc_num_ring),
@@ -85,7 +86,8 @@ SCManager::SCManager(
     NUM_CANDIDATES_FROM_TREE(num_candidates_from_tree),
     SEARCH_RATIO(search_ratio),
     SC_DIST_THRES(sc_dist_thres),
-    TREE_MAKING_PERIOD_(tree_making_period) {}
+    TREE_MAKING_PERIOD_(tree_making_period),
+    DOWNSAMPLE_RES(downsample_res) {}
 
 
 double SCManager::distDirectSC ( MatrixXd &_sc1, MatrixXd &_sc2 )
@@ -249,9 +251,11 @@ MatrixXd SCManager::makeSectorkeyFromScancontext( Eigen::MatrixXd &_desc )
 } // SCManager::makeSectorkeyFromScancontext
 
 
-uint64_t SCManager::makeAndSaveScancontextAndKeys( pcl::PointCloud<SCPointType> & _scan_down )
-{
-    Eigen::MatrixXd sc = makeScancontext(_scan_down); // v1 
+uint64_t SCManager::makeAndSaveScancontextAndKeys( pcl::PointCloud<SCPointType>::Ptr & _scan_down, bool preprocessing)
+{   
+    if (preprocessing) preprocess(_scan_down);
+
+    Eigen::MatrixXd sc = makeScancontext(*_scan_down); // v1 
     Eigen::MatrixXd ringkey = makeRingkeyFromScancontext( sc );
     Eigen::MatrixXd sectorkey = makeSectorkeyFromScancontext( sc );
     std::vector<float> polarcontext_invkey_vec = eig2stdvec( ringkey );
@@ -264,6 +268,28 @@ uint64_t SCManager::makeAndSaveScancontextAndKeys( pcl::PointCloud<SCPointType> 
     return polarcontexts_.size()-1;
     
 } // SCManager::makeAndSaveScancontextAndKeys
+
+
+bool SCManager::descriptorExists(uint64_t id) {
+    return id < polarcontexts_.size();
+}
+
+Eigen::MatrixXd SCManager::getDescriptor(uint64_t id) {
+    if (!descriptorExists(id)) throw std::out_of_range("No descriptor by this id");
+    return polarcontexts_.at(id);
+}
+
+void SCManager::preprocess(pcl::PointCloud<SCPointType>::Ptr &pc) {
+    pcl::VoxelGrid<SCPointType> voxel_grid;
+    voxel_grid.setLeafSize(
+        static_cast<float>(DOWNSAMPLE_RES),
+        static_cast<float>(DOWNSAMPLE_RES),
+        static_cast<float>(DOWNSAMPLE_RES));
+    voxel_grid.setInputCloud(pc);
+
+    voxel_grid.filter(*pc);
+}
+
 
 
 std::pair<int, float> SCManager::detectLoopClosureID ( void )
@@ -359,4 +385,4 @@ std::pair<int, float> SCManager::detectLoopClosureID ( void )
 
 } // SCManager::detectLoopClosureID
 
-// } // namespace SC2
+} // namespace SC2
